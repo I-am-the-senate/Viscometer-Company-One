@@ -1,6 +1,5 @@
 #include "Interface.h"
 
-#include "Arduino.h"
 
 Interface::Interface(int Rx, int Ry)
 {
