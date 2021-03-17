@@ -1,0 +1,32 @@
+
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#define ONE_WIRE_BUS A5
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+int PT1 = 1;//peltier pins 1 and 2
+int PT2 = 2;
+int Tset;
+void setup(){
+pinMode (PT1,OUTPUT);
+pinMode (PT2,OUTPUT); 
+
+analogWrite (1,0);//initialize to ground
+analogWrite (2,0);
+}
+void loop()
+{
+if (sensors.getTempCByIndex(0)<Tset ){
+  analogWrite (1,255);// Heat up
+  analogWrite (2,0);
+}
+else if (sensors.getTempCByIndex(0)>Tset){
+analogWrite (1,0);//cool down
+analogWrite (2,255);
+}
+else {
+analogWrite (1,0);//do nothing
+analogWrite (2,0);
+}
+delay (100);//  for motor contorl part to start
+}
