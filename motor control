@@ -1,0 +1,42 @@
+#include <Adafruit_INA260.h>
+double t=0;
+double tp=0;
+double Voltages[] = {1.5, 4, 8, 3, 6};
+double powers[]={0,0,0,0,0};
+double freqs[]={0,0,0,0,0};
+Adafruit_INA260 ina260 = Adafruit_INA260();
+
+
+void setup() {
+pinMode(4, INPUT);
+pinMode(3, OUTPUT);
+attachInterrupt(4, addRotation, RISING);
+}
+void addRotation() {
+ t=millis(); 
+}
+double Getfreq(){
+  double freq=0;
+  int i=0;
+  while(i!=1){
+     noInterrupts();
+if(t!=tp and tp!=0)
+{
+  freq=1/(t-tp);
+  i++;
+}
+tp=t;
+interrupts();
+delay (100);
+  }
+  
+ return freq;
+}
+
+void test(){
+for (int i=4;i>=0; i--)
+{analogWrite(3, Voltages[i]);
+delay (500);
+freqs[i]=Getfreq();
+powers[i]=ina260.readCurrent();
+}}
