@@ -1,12 +1,12 @@
 #include <Adafruit_INA260.h>
 int analogPin = 3;
-double t=0;
-double tp=0;
-double Voltages[] = {50, 100, 150, 200, 250};
-double powers[]={0,0,0,0,0};
-double freqs[]={0,0,0,0,0};
+float t=0;
+float tp=0;
+float Voltages[] = {50, 100, 150, 200, 250};
+float powers[]={0,0,0,0,0};
+float freqs[]={0,0,0,0,0};
 Adafruit_INA260 ina260 = Adafruit_INA260();
-double freq=0;
+float freq=0;
 
 void setup() {
 pinMode(2, INPUT);
@@ -20,7 +20,7 @@ void addRotation() {
  t=millis();
  
 }
-double Getfreq(){
+float Getfreq(){
  freq=0;
   
   int i=0;
