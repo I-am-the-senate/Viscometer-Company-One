@@ -1,33 +1,43 @@
 #include <Adafruit_INA260.h>
+int analogPin = 3;
 double t=0;
 double tp=0;
-double Voltages[] = {1.5, 4, 8, 3, 6};
+double Voltages[] = {50, 100, 150, 200, 250};
 double powers[]={0,0,0,0,0};
 double freqs[]={0,0,0,0,0};
 Adafruit_INA260 ina260 = Adafruit_INA260();
-
+double freq=0;
 
 void setup() {
-pinMode(4, INPUT);
-pinMode(3, OUTPUT);
-attachInterrupt(4, addRotation, RISING);
+pinMode(2, INPUT);
+pinMode(analogPin, OUTPUT);
+attachInterrupt(digitalPinToInterrupt(2), addRotation, RISING);
+Serial.begin(9600);
 }
 void addRotation() {
- t=millis(); 
+ 
+ 
+ t=millis();
+ 
 }
 double Getfreq(){
-  double freq=0;
+ freq=0;
+  
   int i=0;
   while(i!=1){
+    
      noInterrupts();
-if(t!=tp and tp!=0)
+if(tp!=0 and t!=tp)
 {
-  freq=1/(t-tp);
+  freq=1000/(t-tp);
   i++;
 }
+
+
+
 tp=t;
 interrupts();
-delay (100);
+delay (1);
   }
   
  return freq;
@@ -35,8 +45,35 @@ delay (100);
 
 void test(){
 for (int i=4;i>=0; i--)
-{analogWrite(3, Voltages[i]);
+{analogWrite(analogPin, Voltages[i]);
 delay (500);
 freqs[i]=Getfreq();
-powers[i]=ina260.readCurrent();
+powers[i]=ina260.readPower();
+Serial.print("freq:");
+Serial.print(freqs[i]);
+Serial.print("Current: ");
+  Serial.print(ina260.readCurrent());
+  Serial.println(" mA");
+
+  Serial.print("Bus Voltage: ");
+  Serial.print(ina260.readBusVoltage());
+  Serial.println(" mV");
+
+  Serial.print("Power: ");
+  Serial.print(ina260.readPower());
+  Serial.println(" mW");
+
 }}
+
+
+
+
+
+void loop() {
+ 
+  
+  test();
+  Serial.print("\n");
+
+
+}
