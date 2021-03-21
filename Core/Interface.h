@@ -5,6 +5,14 @@
 #include <Adafruit_ST7735.h>
 #include <SPI.h>
 
+//Constants to be defined. MAY BE CHANGED BASED ON OUR PARAMETERS
+#define NUMBER_OF_VALUES  6
+#define SCREEN_WIDTH  160
+#define SCREEN_HEIGHT  128
+#define DATA_GRAPH_ORIGINX 10
+#define DATA_GRAPH_ORIGINY 88
+
+
 class JoystickXY
 /*Type to store x and y position of joystic*/
 {
@@ -14,6 +22,7 @@ public:
     int x;
     int y;
     JoystickXY(int,int);
+    JoystickXY(JoystickXY&);
     ~JoystickXY();
 };
 
@@ -30,17 +39,26 @@ private:
     uint8_t TFT_RST;
     //tft display object
     Adafruit_ST7735 * display;//Needs to be adressed as pointer (IF not it would give error for not giving arguments to contructor here)
+    //General bool to check whether the user has requested to be out of a window
+    bool windowStop;
     //cursor Speed
     int xSpeed;
     int ySpeed;
     //cursor position
     int cursorX;
     int cursorY;
-
+    //For graphing
+    double xScale;
+    double yScale;
+    int xGraphCoordinates[NUMBER_OF_VALUES];
+    int yGraphCoordinates[NUMBER_OF_VALUES];
+    int graphCursorX;
+    int graphCursorY;
+    JoystickXY * joyPosForMovement;
 public:
     Interface(int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST = -1);    //Constructor prototype|||| By default the screen reset pin will be set to the reset button
     ~Interface();   //Destructor prototype
-
-    JoystickXY getJoyPos();
+    graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VALUES]);//Swithes to a graph visualization screen
+    JoystickXY getJoyPos();//Position of Joystick
 };
 #endif

@@ -14,6 +14,13 @@ Interface::Interface(int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST)
     //Set pin modes for joystick control
     pinMode(RX,INPUT);
     pinMode(RY,INPUT);
+    this->xSpeed = 0;//Speeds of movement for joystick
+    this->ySpeed = 0;
+    graphCursorX = DATA_GRAPH_ORIGINX+10;
+    graphCursorY = DATA_GRAPH_ORIGINY-10;
+    joyPosForMovement = new JoystickXY(DATA_GRAPH_ORIGINX,DATA_GRAPH_ORIGINY);
+    //Set window stop to false by default
+    windowStop = false;
     //Start up the display
     display = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
     display->initR(INITR_BLACKTAB);  // Init ST7735S chip, black tab. TBD: Investigate into what this does
@@ -28,13 +35,62 @@ Interface::Interface(int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST)
     display->setTextSize(1);
     display->println("getting things ready...");
     
-    this->xSpeed = 0;//Speeds of movement for joystick
-    this->ySpeed = 0;
 }
-
 Interface::~Interface()
 {
     delete display;//pointers need to be deleted when the object is deconstructed
+    delete joyPosForMovement;
+}
+Interface::graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VALUES])
+{
+    /*This function opens up a screen to view a graph of the data provided as parameters (x is strain rate, y is shear stress).
+    The cursor can be moved to see the values by using the joystick and one can exit out with the key pad*/
+    xScale = (float(SCREEN_WIDTH)-(DATA_GRAPH_ORIGINX+10))/(xValues[NUMBER_OF_VALUES-1]-xValues[0]);// determine scaling down of values into pixels leaving some space for the axis labels
+    yScale = (DATA_GRAPH_ORIGINY+10)/(yValues[NUMBER_OF_VALUES-1]-yValues[0]);//Same for the y values
+
+    //Determine the positions where the data points shall be plotted on the screen
+    for(int i = 0; i <= NUMBER_OF_VALUES-1; i++){
+        xGraphCoordinates[i] = (((xValues[i]-xValues[0])*xScale))+DATA_GRAPH_ORIGINX;
+        yGraphCoordinates[i] = (DATA_GRAPH_ORIGINY)-(((yValues[i]-yValues[0])*yScale));
+        Serial.println(yGraphCoordinates[i]);
+    }
+    //Screen Prep----------------------------------------------------------------------------------------------------------------------------------------------------
+    display->fillScreen(ST77XX_BLACK);
+    display->setTextColor(ST77XX_GREEN);
+    display->setTextSize(1);
+    //Main Loop------------------------------------------------------------------------------------------------------------------------------------------------------------
+    while(windowStop == false){
+        //Clear up cursor from last position
+        display->fillCircle(graphCursorX,graphCursorY,2,ST7735_BLACK);
+        //axis lines
+        display->drawFastHLine(0,DATA_GRAPH_ORIGINY+5,SCREEN_WIDTH,ST7735_WHITE);
+        display->drawFastVLine(DATA_GRAPH_ORIGINX-5,0,DATA_GRAPH_ORIGINY+10,ST7735_WHITE);
+        //Draw points on graph
+        for(int i = 0; i <= NUMBER_OF_VALUES-1; i++){
+            display->fillCircle(xGraphCoordinates[i], yGraphCoordinates[i], 3, ST7735_BLUE);
+        }
+        //Check Input
+        *joyPosForMovement = getJoyPos();
+        //Update Cursor position on graph
+        if (joyPosForMovement->x > 0 && graphCursorX <= SCREEN_WIDTH){
+            graphCursorX += joyPosForMovement->x;
+        }else if (joyPosForMovement->x < 0 && graphCursorX >= DATA_GRAPH_ORIGINX){
+            graphCursorX += joyPosForMovement->x;
+        }
+        if (joyPosForMovement->y > 0 && graphCursorY <= DATA_GRAPH_ORIGINY){
+            graphCursorY += joyPosForMovement->y;
+        }else if (joyPosForMovement->y < 0 && graphCursorY >= 0){
+            graphCursorY += joyPosForMovement->y;
+        }
+        //Draw cursor
+        display->drawCircle(graphCursorX,graphCursorY,2,ST7735_GREEN);
+        //Show position of cursor
+        display->setCursor(2, 110);
+        display->fillRect(70,110,SCREEN_WIDTH-50,20,ST7735_BLACK);//clear previous numbers
+        display->println("Strain Rate:"+String(((graphCursorX-DATA_GRAPH_ORIGINX)/xScale)+xValues[0]) + "\nShear Stress:" + String(((DATA_GRAPH_ORIGINY-graphCursorY)/yScale)+yValues[0]));
+    }
+    windowStop = false;
+
 }
 JoystickXY Interface::getJoyPos()
 {
@@ -45,11 +101,17 @@ JoystickXY Interface::getJoyPos()
 }
 
 
-JoystickXY::JoystickXY(int x, int y)
+JoystickXY::JoystickXY(int x = DATA_GRAPH_ORIGINX, int y = DATA_GRAPH_ORIGINY)
 {
     this->x = x;
     this->y = y;
 }
+JoystickXY::JoystickXY(JoystickXY& jstick)
+{
+    this->x = jstick.x;
+    this->y = jstick.y;
+}
+
 JoystickXY::~JoystickXY()
 {
 
