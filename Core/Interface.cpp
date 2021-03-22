@@ -3,7 +3,7 @@
 #include <Adafruit_ST7735.h>
 
 
-Interface::Interface(int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST)
+Interface::Interface(byte rowPins[KEYROWS], byte colPins[KEYCOLS],int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST)
 {
     //Pins definitions
     this->RX = RX;
@@ -11,9 +11,6 @@ Interface::Interface(int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST)
     this->TFT_CS = TFT_CS;
     this->TFT_DC = TFT_DC;
     this->TFT_RST = TFT_RST;
-    //Set pin modes for joystick control
-    pinMode(RX,INPUT);
-    pinMode(RY,INPUT);
     this->xSpeed = 0;//Speeds of movement for joystick
     this->ySpeed = 0;
     graphCursorX = DATA_GRAPH_ORIGINX+10;
@@ -21,6 +18,46 @@ Interface::Interface(int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST)
     joyPosForMovement = new JoystickXY(DATA_GRAPH_ORIGINX,DATA_GRAPH_ORIGINY);
     //Set window stop to false by default
     windowStop = false;
+    //prepare keypad
+    rowPins = rowPins; //connect to the row pinouts of the keypad
+    colPins = colPins; //connect to the column pinouts of the keypad
+    keys[0][0] = '1';//Keys must be assigned individually as an initializer list cannot be assigned to an array after declaration
+    keys[0][1] = '2';
+    keys[0][2] = '3';
+    keys[0][3] = 'A';
+    keys[1][0] = '4';
+    keys[1][1] = '5';
+    keys[1][2] = '6';
+    keys[1][3] = 'B';
+    keys[2][0] = '7';
+    keys[2][1] = '8';
+    keys[2][2] = '9';
+    keys[2][3] = 'C';
+    keys[3][0] = '*';
+    keys[3][1] = '0';
+    keys[3][2] = '#';
+    keys[3][3] = 'D';
+    /*
+    keys = {
+        {'1','2','3','A'},
+        {'4','5','6','B'},
+        {'7','8','9','C'},
+        {'*','0','#','D'}
+    };*/
+    keypad = new Keypad(makeKeymap(keys), rowPins, colPins, KEYROWS, KEYCOLS);
+    
+}
+Interface::~Interface()
+{
+    delete display;//pointers need to be deleted when the object is deconstructed
+    delete joyPosForMovement;
+    delete keypad;
+}
+Interface::init()
+{
+    //Set pin modes for joystick control
+    pinMode(RX,INPUT);
+    pinMode(RY,INPUT);
     //Start up the display
     display = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
     display->initR(INITR_BLACKTAB);  // Init ST7735S chip, black tab. TBD: Investigate into what this does
@@ -34,12 +71,6 @@ Interface::Interface(int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST)
     display->setTextColor(ST77XX_WHITE);
     display->setTextSize(1);
     display->println("getting things ready...");
-    
-}
-Interface::~Interface()
-{
-    delete display;//pointers need to be deleted when the object is deconstructed
-    delete joyPosForMovement;
 }
 Interface::graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VALUES])
 {
