@@ -29,7 +29,7 @@ analogWrite(analogPin,0);
 
 sensors.requestTemperatures();
 float y=sensors.getTempCByIndex(0)
-if(y<10 or y>35);//temperature range
+if(y<10 or y>35)//temperature range
 {
 Serial.println("temp probe is not working ");//screen messege
 while (1);
@@ -41,4 +41,18 @@ Serial.println("SD initialization failed!");
 while (1);
 }
 
+
+
+int i=0;
+
+while(1){
+if(analogRead(A0)>530 or analogRead(A0)<490 ){
+Serial.println("joystick is working");
+break;}
+if(i==20)
+{Serial.println("joystick not working");
+while(1);}
+delay(500);
+i++;
+}
 }
