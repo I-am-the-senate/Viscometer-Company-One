@@ -31,7 +31,6 @@ public:
 
 class Interface
 /*Main class that is used to make a interface object which will control all input and output with the user*/
-//NOTE!!! Interface Class Needs to be declared as pointer in the main code initally and then created in the setup as its constructor runs program instructions that need to go there!
 {
 private:
     //pins
@@ -64,11 +63,21 @@ private:
     char keys[KEYROWS][KEYCOLS];
     byte rowPins[KEYROWS];
     byte colPins[KEYCOLS];
+    char keyPressed; //key that has been pressed
+    //Temperature selection
 
 public:
     Interface(byte rowPins[KEYROWS], byte colPins[KEYCOLS],int RX, int RY, int TFT_CS, int TFT_DC, int TFT_RST = -1);    //Constructor prototype|||| By default the screen reset pin will be set to the reset button
     ~Interface();   //Destructor prototype
     init();
+    loadingScreen();
+    heatingScreen();
+    saveScreen();
+    updateHeatingScreen(int temperature);
+    experimentScreen();
+    promptScreen(String title, String message);
+    bool questionScreen(String title, String message);
+    int tempSelect();
     graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VALUES]);//Swithes to a graph visualization screen
     JoystickXY getJoyPos();//Position of Joystick
     Keypad * keypad;//keypad object

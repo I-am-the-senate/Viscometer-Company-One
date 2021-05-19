@@ -62,15 +62,181 @@ Interface::init()
     display = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
     display->initR(INITR_BLACKTAB);  // Init ST7735S chip, black tab. TBD: Investigate into what this does
     display->setRotation(1);//Put the screen on Landscape mode
-    display->fillScreen(ST77XX_BLACK);
+    this->loadingScreen();
+}
+Interface::loadingScreen()
+{
+    display->fillScreen(ST77XX_WHITE);
     display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
-    display->setTextColor(ST77XX_WHITE);
+    display->setTextColor(ST77XX_BLACK);
     display->setTextSize(3.5);
     display->println("flow.io");
     display->setCursor(15, 80);
-    display->setTextColor(ST77XX_WHITE);
     display->setTextSize(1);
     display->println("getting things ready...");
+}
+Interface::heatingScreen()
+{
+    display->fillScreen(ST77XX_WHITE);
+    display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
+    display->setTextColor(ST77XX_BLACK);
+    display->setTextSize(3.5);
+    display->println("flow.io");
+    display->setCursor(15, 80);
+    display->setTextSize(1);
+    display->println("Reaching target");
+    display->setCursor(15,90);
+    display->println("temperature...");
+    display->setCursor(10,110);
+    display->println("Current temperature:");
+}
+Interface::updateHeatingScreen(int temperature)
+{
+    //prints new value of current temperature on heating screen
+    display->fillRect(130,110,SCREEN_WIDTH-130,10,ST77XX_WHITE);//clear previous displayed temperature
+    display->setCursor(130,110);
+    display->println(String(temperature));
+
+}
+Interface::experimentScreen()
+{
+    display->fillScreen(ST77XX_WHITE);
+    display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
+    display->setTextColor(ST77XX_BLACK);
+    display->setTextSize(3.5);
+    display->println("flow.io");
+    display->setCursor(15, 80);
+    display->setTextSize(1);
+    display->println("conducting experiment...");
+}
+Interface::saveScreen()
+{
+    display->fillScreen(ST77XX_WHITE);
+    display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
+    display->setTextColor(ST77XX_BLACK);
+    display->setTextSize(3.5);
+    display->println("flow.io");
+    display->setCursor(15, 80);
+    display->setTextSize(1);
+    display->println("saving to SD...");
+}
+Interface::promptScreen(String title,String message)
+{
+    /*writes a message with a Title and a content on the screen. Waits until D is pressed to continue. Text string needs to be manually adjusted until no cuts are made in the word
+    and a space is recommended before each line of the message*/
+    display->fillScreen(ST77XX_WHITE);
+    display->setCursor(1, 2);//Write a start up message on to screen (first by setting the cursor on where we want the text)
+    display->setTextColor(ST77XX_BLACK);
+    display->setTextSize(3);
+    display->println(title);
+    display->setCursor(0, 35);
+    display->setTextSize(1);
+    display->println(message);
+    display->setCursor(110, 100);
+    display->println("D-Done");
+    while(windowStop == false){
+        keyPressed = this->keypad->getKey();
+        if (keyPressed != NO_KEY){
+            if (keyPressed == 'D'){
+                windowStop = true;
+            }
+        }
+    }
+    windowStop = false;
+    
+}
+bool Interface::questionScreen(String title,String message)
+{
+    /*writes a message with a Title and a content on the screen. Waits until A or B is pressed to continue. Text string needs to be manually adjusted until no cuts are made in the word
+    and a space is recommended before each line of the message.
+    Returns True if A is pressed and false if B is pressed*/
+    windowStop = false;
+    display->fillScreen(ST77XX_WHITE);
+    display->setCursor(1, 2);//Write a start up message on to screen (first by setting the cursor on where we want the text)
+    display->setTextColor(ST77XX_BLACK);
+    display->setTextSize(3);
+    display->println(title);
+    display->setCursor(0, 35);
+    display->setTextSize(1);
+    display->println(message);
+    display->setCursor(30, 100);
+    display->println("A-Yes");
+    display->setCursor(100, 100);
+    display->println("B-No");
+    while(windowStop == false){
+        keyPressed = this->keypad->getKey();
+        if (keyPressed != NO_KEY){
+            if (keyPressed == 'A'){
+                return true;
+            }if (keyPressed == 'B'){
+                return false;
+            }
+        }
+    }
+}
+Interface::tempSelect()
+{
+    /*this screen lets you choose a meassurement temperature with the keypad. It returns the temperature value as an int. IF the return value is 1998, it means not to use temperature control
+    (ambient)*/
+    int temperature = 0;
+    int counter = 0;
+    //Set up what doesn't change in the screen
+    display->fillScreen(ST7735_WHITE);
+    display->setTextColor(ST77XX_BLACK);
+    display->setTextSize(2);
+    display->setCursor(1, 5);
+    display->println("Test Temp. C");
+    display->setTextSize(1);
+    display->setCursor(10, 100);
+    display->println("A-Ambient Temp");
+    display->setCursor(110, 100);
+    display->println("D-Done");
+    display->setCursor(10, 110);
+    display->println("*-Erase");
+    display->setCursor(110, 110); 
+
+    display->drawRect(20,30,SCREEN_WIDTH-53,50,ST77XX_RED);
+
+    display->setTextSize(6);//text size for numbers on screen
+    while(windowStop == false){
+        //main loop of temperature selection screen
+
+        if(counter == 0){
+            display->setCursor(22, 35);
+            display->println("000");
+        }else if(counter == 1){
+            display->setCursor(22, 35);
+            display->println("00"+String(temperature));
+        }else if(counter == 2){
+            display->setCursor(22, 35);
+            display->println("0"+String(temperature));
+        }else if(counter == 3){
+            display->setCursor(22, 35);
+            display->println(String(temperature));
+        }
+        //check keypad and act accordingly
+        keyPressed = this->keypad->getKey();
+        if (keyPressed != NO_KEY){
+            if (keyPressed == 'D'){
+                windowStop = true;
+            }else if(keyPressed == '*'){
+                counter = 0;
+                temperature = 0;
+                display->fillRect(21,31,SCREEN_WIDTH-55,48,ST77XX_WHITE);//clear previous displayed temperature
+            }else if(keyPressed == 'A'){
+                counter = 3;
+                temperature = 1998;
+                windowStop = true;
+            }if (counter < 3 && (keyPressed=='0'||keyPressed=='1'||keyPressed=='2'||keyPressed=='3'||keyPressed=='4'||keyPressed=='5'||keyPressed=='6'||keyPressed=='7'||keyPressed=='8'||keyPressed=='9')){
+                display->fillRect(21,31,SCREEN_WIDTH-55,48,ST77XX_WHITE);//clear previous displayed temperature
+                counter++;
+                temperature = temperature * 10 + int(keyPressed)-48;//-48 factor is due to the string() conversion
+            }
+        }
+    }
+    windowStop = false;
+    Serial.println(temperature);
+    return temperature;
 }
 Interface::graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VALUES])
 {
@@ -86,16 +252,19 @@ Interface::graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VA
         Serial.println(yGraphCoordinates[i]);
     }
     //Screen Prep----------------------------------------------------------------------------------------------------------------------------------------------------
-    display->fillScreen(ST77XX_BLACK);
-    display->setTextColor(ST77XX_GREEN);
+    display->fillScreen(ST77XX_WHITE);
+    display->setTextColor(ST77XX_BLACK);
     display->setTextSize(1);
+    //Istruction print --------------------------------------------------------------------------------------------------------------------------------------------
+    display->setCursor(120, 100);
+    display->println("D-Done");
     //Main Loop------------------------------------------------------------------------------------------------------------------------------------------------------------
     while(windowStop == false){
         //Clear up cursor from last position
-        display->fillCircle(graphCursorX,graphCursorY,2,ST7735_BLACK);
+        display->fillCircle(graphCursorX,graphCursorY,2,ST77XX_WHITE);
         //axis lines
-        display->drawFastHLine(0,DATA_GRAPH_ORIGINY+5,SCREEN_WIDTH,ST7735_WHITE);
-        display->drawFastVLine(DATA_GRAPH_ORIGINX-5,0,DATA_GRAPH_ORIGINY+10,ST7735_WHITE);
+        display->drawFastHLine(0,DATA_GRAPH_ORIGINY+5,SCREEN_WIDTH,ST7735_BLACK);
+        display->drawFastVLine(DATA_GRAPH_ORIGINX-5,0,DATA_GRAPH_ORIGINY+10,ST7735_BLACK);
         //Draw points on graph
         for(int i = 0; i <= NUMBER_OF_VALUES-1; i++){
             display->fillCircle(xGraphCoordinates[i], yGraphCoordinates[i], 3, ST7735_BLUE);
@@ -114,11 +283,18 @@ Interface::graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VA
             graphCursorY += joyPosForMovement->y;
         }
         //Draw cursor
-        display->drawCircle(graphCursorX,graphCursorY,2,ST7735_GREEN);
+        display->drawCircle(graphCursorX,graphCursorY,2,ST7735_RED);
         //Show position of cursor
         display->setCursor(2, 110);
-        display->fillRect(70,110,SCREEN_WIDTH-50,20,ST7735_BLACK);//clear previous numbers
+        display->fillRect(70,110,SCREEN_WIDTH-50,20,ST77XX_WHITE);//clear previous numbers
         display->println("Strain Rate:"+String(((graphCursorX-DATA_GRAPH_ORIGINX)/xScale)+xValues[0]) + "\nShear Stress:" + String(((DATA_GRAPH_ORIGINY-graphCursorY)/yScale)+yValues[0]));
+        //check key input
+        keyPressed = this->keypad->getKey();
+        if (keyPressed != NO_KEY){
+            if (keyPressed == 'D'){
+                windowStop = true;
+            }
+        }
     }
     windowStop = false;
 
