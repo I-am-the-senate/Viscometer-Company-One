@@ -1,0 +1,58 @@
+void startest()
+{
+  Serial.println("Adafruit INA260 Test");// INA260 test
+ 
+  if (!ina260.begin()) {
+    Serial.println("Couldn't find INA260 chip");//screen messege
+    while(1);
+  }
+  Serial.println("Found INA260 chip");//screen messege
+  delay(1000);
+
+  analogWrite(analogPin,200);//motor test, change PWM value if you want
+  delay(500);
+  if (ina260.readCurrent()<5 or ina260.readCurrent()>50)//5 and 50 are range of reasonable currents, change if needed
+   {
+    Serial.println("motor is not working ");//screen messege
+    while(1);
+   }
+    Serial.println("motor is working ");//screen messege
+
+  float j=Getfreq();
+  if(j<5 or j>50);//5 and 50 are range of reasonable frequencies, change if needed
+{
+  Serial.println("photo interruptor is not working ");//screen messege
+  while(1);
+}
+Serial.println("photo interruptor is working ");//screen messege
+analogWrite(analogPin,0);
+
+sensors.requestTemperatures();
+float y=sensors.getTempCByIndex(0)
+if(y<10 or y>35)//temperature range
+{
+Serial.println("temp probe is not working ");//screen messege
+while (1);
+}
+Serial.println("temp probe is working ");//screen messege
+
+if (!SD.begin(10)) {
+Serial.println("SD initialization failed!");
+while (1);
+}
+
+
+
+int i=0;
+
+while(1){
+if(analogRead(A0)>530 or analogRead(A0)<490 ){
+Serial.println("joystick is working");
+break;}
+if(i==20)
+{Serial.println("joystick not working");
+while(1);}
+delay(500);
+i++;
+}
+}
