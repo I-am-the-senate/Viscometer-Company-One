@@ -47,7 +47,8 @@ void loop() {
   //Getting to temperature phase
   pinkInterface.heatingScreen();//with these couple of lines we put a screen while it reaches a target temperature, and we can update the displayed current temp
   //temperature control starts
-  
+  if (wantedTemp != 1998)
+  {
   for (;int(sensors.getTempCByIndex(0)) != wantedTemp;)
   {
   if (int(sensors.getTempCByIndex(0))<wantedTemp ){
@@ -65,7 +66,7 @@ analogWrite (2,0);
 //  for motor contorl part to start
   pinkInterface.updateHeatingScreen(int(sensors.getTempCByIndex(0)));
   }
-  
+  }
 
   //Experiment phase (take the meassurements while keeping temperature)
   pinkInterface.experimentScreen();
