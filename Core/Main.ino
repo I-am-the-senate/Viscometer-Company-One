@@ -17,7 +17,6 @@ byte colPins[4] = {8, A2, A3,A4};
 Interface pinkInterface = Interface (rowPins,colPins,A1,A0,10,9,-1);
 
 int wantedTemp = 1998;//just in case, we start it at the ambient value. It is an int for the desired temperature in degrees C
-int currentTemp = 0;//to keep current temperature
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -49,13 +48,13 @@ void loop() {
   pinkInterface.heatingScreen();//with these couple of lines we put a screen while it reaches a target temperature, and we can update the displayed current temp
   //temperature control starts
   
-  for (;INT(sensors.getTempCByIndex(0)) != wantedTemp;)
+  for (;int(sensors.getTempCByIndex(0)) != wantedTemp;)
   {
-  if (INT(sensors.getTempCByIndex(0))<wantedTemp ){
+  if (int(sensors.getTempCByIndex(0))<wantedTemp ){
   analogWrite (1,255);// Heat up
   analogWrite (2,0);
 }
-else if (INT(sensors.getTempCByIndex(0))>wantedTemp){
+else if (int(sensors.getTempCByIndex(0))>wantedTemp){
 analogWrite (1,0);//cool down
 analogWrite (2,255);
 }
@@ -64,8 +63,7 @@ analogWrite (1,0);//do nothing
 analogWrite (2,0);
 }
 //  for motor contorl part to start
-  pinkInterface.updateHeatingScreen(currentTemp);//here it is convenient to put some sort of while loop to check wether the temperature has been kepts within a range for a time or similar
-  delay(1000);//placeholder
+  pinkInterface.updateHeatingScreen(int(sensors.getTempCByIndex(0)));
   }
   
 
