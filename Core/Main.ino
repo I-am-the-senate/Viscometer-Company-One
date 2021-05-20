@@ -1,6 +1,15 @@
+                                                                             //PROJEKT FLOWIO
+                                                                 //AUTHOR Barbero Carlos Yu gu Adam Nowek
 #include "Interface.h"
 #include "Keypad.h"
-
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#define ONE_WIRE_BUS A5
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+int PT1 = 1;//peltier pins 1 and 2
+int PT2 = 2;
+int Tset;
 float testdataX [6] = {0.0,500.0,1000.0,1500.0,2000.0,2500.0};
 float testdataY [6] = {1.435,2.33,3.686,6.426,5.444,8.42};
 byte rowPins[4] = {0, 5, 6, 7};
@@ -14,8 +23,15 @@ void setup() {
   Serial.begin(115200);
   pinkInterface.init();//PUT at start of set up. Will show an initial screen message while the rest of the rest of the machine preps
   Serial.println("Interface prepared");
-
+  
   /*Put here any set up code needed that will run while the loading screen is shown*/
+  //peltier initialization part
+pinMode (PT1,OUTPUT);
+pinMode (PT2,OUTPUT); 
+
+analogWrite (1,0);//initialize to ground
+analogWrite (2,0);
+  //peltier initialization complete
 }
 
 void loop() {
@@ -31,8 +47,27 @@ void loop() {
   pinkInterface.promptScreen("Ready"," Ready to start test.\n press D to carry out the\n test");
   //Getting to temperature phase
   pinkInterface.heatingScreen();//with these couple of lines we put a screen while it reaches a target temperature, and we can update the displayed current temp
+  //temperature control starts
+  
+  for (;INT(sensors.getTempCByIndex(0)) != wantedTemp;)
+  {
+  if (INT(sensors.getTempCByIndex(0))<wantedTemp ){
+  analogWrite (1,255);// Heat up
+  analogWrite (2,0);
+}
+else if (INT(sensors.getTempCByIndex(0))>wantedTemp){
+analogWrite (1,0);//cool down
+analogWrite (2,255);
+}
+else {
+analogWrite (1,0);//do nothing
+analogWrite (2,0);
+}
+//  for motor contorl part to start
   pinkInterface.updateHeatingScreen(currentTemp);//here it is convenient to put some sort of while loop to check wether the temperature has been kepts within a range for a time or similar
   delay(1000);//placeholder
+  }
+  
 
   //Experiment phase (take the meassurements while keeping temperature)
   pinkInterface.experimentScreen();
