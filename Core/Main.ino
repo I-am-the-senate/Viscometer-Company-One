@@ -8,7 +8,7 @@
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 int PT1 = 1;//peltier pins 1 and 2
-int PT2 = 2;
+int PT2 = 4;
 int Tset;
 float testdataX [6] = {0.0,500.0,1000.0,1500.0,2000.0,2500.0};
 float testdataY [6] = {1.435,2.33,3.686,6.426,5.444,8.42};
