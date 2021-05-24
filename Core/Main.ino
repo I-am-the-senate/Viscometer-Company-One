@@ -5,6 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #define ONE_WIRE_BUS A5
+#include <Adafruit_INA260.h>
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 int PT1 = 1;//peltier pins 1 and 2
@@ -14,6 +15,15 @@ float testdataY [6] = {1.435,2.33,3.686,6.426,5.444,8.42};
 byte rowPins[4] = {0, 5, 6, 7};
 byte colPins[4] = {8, A2, A3,A4};
 Interface pinkInterface = Interface (rowPins,colPins,A1,A0,10,9,-1);
+
+int analogPin = 3;
+float t=0;
+float tp=0;
+float Voltages[] = {50, 100, 150, 200, 250};
+float powers[]={0,0,0,0,0};
+float freqs[]={0,0,0,0,0};
+Adafruit_INA260 ina260 = Adafruit_INA260();//stuff for motor control
+float freq=0;
 
 int wantedTemp = 1998;//just in case, we start it at the ambient value. It is an int for the desired temperature in degrees C
 void setup() {
@@ -30,7 +40,53 @@ pinMode (PT2,OUTPUT);
 analogWrite (1,0);//initialize to ground
 analogWrite (2,0);
   //peltier initialization complete
+  
+  pinMode(2, INPUT);
+pinMode(analogPin, OUTPUT);
+attachInterrupt(digitalPinToInterrupt(2), addRotation, RISING);//stuff for motor control
 }
+
+void addRotation() {
+ t=millis();}
+
+float Getfreq(){
+ freq=0;
+ int i=0;
+ while(i!=1){
+ noInterrupts();
+if(tp!=0 and t!=tp)
+{
+  freq=1000/(t-tp);
+  i++;
+}
+tp=t;
+interrupts();
+delay (1);
+  }
+  return freq;
+}
+
+void test(){
+for (int i=4;i>=0; i--)
+{analogWrite(analogPin, Voltages[i]);
+delay (500);
+freqs[i]=Getfreq();
+powers[i]=ina260.readPower();
+Serial.print("freq:");
+Serial.print(freqs[i]);
+Serial.print("Current: ");
+  Serial.print(ina260.readCurrent());
+  Serial.println(" mA");
+
+  Serial.print("Bus Voltage: ");
+  Serial.print(ina260.readBusVoltage());
+  Serial.println(" mV");
+
+  Serial.print("Power: ");
+  Serial.print(ina260.readPower());
+  Serial.println(" mW");
+
+}}
 
 void loop() {
   // put your main code here, to run repeatedly:
