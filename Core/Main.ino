@@ -118,7 +118,6 @@ else {
 analogWrite (1,0);//do nothing
 analogWrite (2,0);
 }
-//  for motor contorl part to start
   pinkInterface.updateHeatingScreen(int(sensors.getTempCByIndex(0)));
   }
   }
