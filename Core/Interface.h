@@ -12,6 +12,8 @@
 #define SCREEN_HEIGHT  128
 #define DATA_GRAPH_ORIGINX 10
 #define DATA_GRAPH_ORIGINY 88
+//commonly repeated messages (to save program memory)
+#define COMPANY_NAME "flow.io"
 //Keypad constants
 #define KEYROWS 4
 #define KEYCOLS 4
