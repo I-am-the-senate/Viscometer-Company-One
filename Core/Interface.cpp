@@ -70,10 +70,10 @@ Interface::loadingScreen()
     display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
     display->setTextColor(ST77XX_BLACK);
     display->setTextSize(3.5);
-    display->println("flow.io");
+    display->println(COMPANY_NAME);
     display->setCursor(15, 80);
     display->setTextSize(1);
-    display->println("getting things ready...");
+    display->println("Loading...");
 }
 Interface::heatingScreen()
 {
@@ -81,7 +81,7 @@ Interface::heatingScreen()
     display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
     display->setTextColor(ST77XX_BLACK);
     display->setTextSize(3.5);
-    display->println("flow.io");
+    display->println(COMPANY_NAME);
     display->setCursor(15, 80);
     display->setTextSize(1);
     display->println("Reaching target");
@@ -104,7 +104,7 @@ Interface::experimentScreen()
     display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
     display->setTextColor(ST77XX_BLACK);
     display->setTextSize(3.5);
-    display->println("flow.io");
+    display->println(COMPANY_NAME);
     display->setCursor(15, 80);
     display->setTextSize(1);
     display->println("conducting experiment...");
@@ -115,7 +115,7 @@ Interface::saveScreen()
     display->setCursor(18, 30);//Write a start up message on to screen (first by setting the cursor on where we want the text)
     display->setTextColor(ST77XX_BLACK);
     display->setTextSize(3.5);
-    display->println("flow.io");
+    display->println(COMPANY_NAME);
     display->setCursor(15, 80);
     display->setTextSize(1);
     display->println("saving to SD...");
