@@ -90,15 +90,15 @@ Serial.print("Current: ");
 
 void loop() {
   // put your main code here, to run repeatedly:
-  pinkInterface.promptScreen("Set-Up", " Please insert sample into machine.\n The sample should cover\n the bob.\n Make sure the water bath\n is filled.\n When finished, press D.");
+  pinkInterface.promptScreen("Set-Up", " Prepare sample and water\n bath.\n When finished, press D.");
   do // we cannot boil the water bath. 1998 is the secret value for Ambient
   {
     wantedTemp = pinkInterface.tempSelect();
     if(wantedTemp >= 100 && wantedTemp != 1998){
-      pinkInterface.promptScreen("Warning"," Temperature selected is\n above max temperature of\n 100 C. To prevent water\n boiling you need to\n select another\n temperature.");
+      pinkInterface.promptScreen("Warning"," Temperature selected is\n above 100 C. Water boils, select another temp");
     }
   }while (wantedTemp >= 100 && wantedTemp != 1998);
-  pinkInterface.promptScreen("Ready"," Ready to start test.\n press D to carry out the\n test");
+  pinkInterface.promptScreen("Ready"," Ready to start test.\n press D to start");
   //Getting to temperature phase
   pinkInterface.heatingScreen();//with these couple of lines we put a screen while it reaches a target temperature, and we can update the displayed current temp
   //temperature control starts
@@ -126,12 +126,13 @@ analogWrite (2,0);
   pinkInterface.experimentScreen();
   delay(1000);//replace this with the code loop needed
   
-  if (pinkInterface.questionScreen("Complete"," Now you can view your\n data.\n Do you want to save it\n to an SD first?")){
+  
+  //Data Analysis phase
+  pinkInterface.graphView(testdataX,testdataY);//The number of datapoints required can be easily changed hardcoded
+  if (pinkInterface.questionScreen("Save?"," Do you want to save\n to an SD?")){
     pinkInterface.saveScreen();
     delay(1000); //replace this with code to save to SD
   }
-  //Data Analysis phase
-  pinkInterface.graphView(testdataX,testdataY);//The number of datapoints required can be easily changed hardcoded
-
-  pinkInterface.promptScreen("Finished", " You can now unplug the\n device.\n Alternatively, if you\n want to start over,\n you can press D");
+  pinkInterface.promptScreen("Finished", " You can now unplug the\n device.\n Or press D to start over");
+  
 }
