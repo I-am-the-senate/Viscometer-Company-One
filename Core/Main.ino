@@ -106,6 +106,7 @@ void loop() {
   {
   for (;int(sensors.getTempCByIndex(0)) != wantedTemp;)
   {
+    sensors.requestTemperatures();
   if (int(sensors.getTempCByIndex(0))<wantedTemp ){
   analogWrite (1,255);// Heat up
   analogWrite (2,0);
