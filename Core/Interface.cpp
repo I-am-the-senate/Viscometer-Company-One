@@ -84,9 +84,7 @@ Interface::heatingScreen()
     display->println(COMPANY_NAME);
     display->setCursor(15, 80);
     display->setTextSize(1);
-    display->println("Reaching target");
-    display->setCursor(15,90);
-    display->println("temperature...");
+    display->println("Reaching temp...");
     display->setCursor(10,110);
     display->println("Current temperature:");
 }
