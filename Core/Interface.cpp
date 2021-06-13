@@ -233,7 +233,6 @@ Interface::tempSelect()
         }
     }
     windowStop = false;
-    Serial.println(temperature);
     return temperature;
 }
 Interface::graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VALUES])
@@ -241,13 +240,12 @@ Interface::graphView(float xValues[NUMBER_OF_VALUES], float yValues[NUMBER_OF_VA
     /*This function opens up a screen to view a graph of the data provided as parameters (x is strain rate, y is shear stress).
     The cursor can be moved to see the values by using the joystick and one can exit out with the key pad*/
     xScale = (float(SCREEN_WIDTH)-(DATA_GRAPH_ORIGINX+10))/(xValues[NUMBER_OF_VALUES-1]-xValues[0]);// determine scaling down of values into pixels leaving some space for the axis labels
-    yScale = (DATA_GRAPH_ORIGINY+10)/(yValues[NUMBER_OF_VALUES-1]-yValues[0]);//Same for the y values
+    yScale = (DATA_GRAPH_ORIGINY+10-DATA_GRAPH_MAXY)/(yValues[NUMBER_OF_VALUES-1]-yValues[0]);//Same for the y values
 
     //Determine the positions where the data points shall be plotted on the screen
     for(int i = 0; i <= NUMBER_OF_VALUES-1; i++){
         xGraphCoordinates[i] = (((xValues[i]-xValues[0])*xScale))+DATA_GRAPH_ORIGINX;
         yGraphCoordinates[i] = (DATA_GRAPH_ORIGINY)-(((yValues[i]-yValues[0])*yScale));
-        Serial.println(yGraphCoordinates[i]);
     }
     //Screen Prep----------------------------------------------------------------------------------------------------------------------------------------------------
     display->fillScreen(ST77XX_WHITE);

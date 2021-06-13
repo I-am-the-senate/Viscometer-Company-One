@@ -7,11 +7,12 @@
 #include <SPI.h>
 
 //Constants to be defined. MAY BE CHANGED BASED ON OUR PARAMETERS
-#define NUMBER_OF_VALUES  6 //Number of datapoints that will be obtained to display on graph
+#define NUMBER_OF_VALUES  10 //Number of datapoints that will be obtained to display on graph
 #define SCREEN_WIDTH  160
 #define SCREEN_HEIGHT  128
 #define DATA_GRAPH_ORIGINX 10
 #define DATA_GRAPH_ORIGINY 88
+#define DATA_GRAPH_MAXY 5
 //commonly repeated messages (to save program memory)
 #define COMPANY_NAME "flow.io"
 //Keypad constants
