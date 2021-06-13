@@ -10,8 +10,8 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 int PT1 = 1;//peltier pins 1 and 2
 int PT2 = 4;
-float testdataX [6] = {0.0,500.0,1000.0,1500.0,2000.0,2500.0};
-float testdataY [6] = {1.435,2.33,3.686,6.426,5.444,8.42};
+float testdataX [10] = {0.0,500.0,1000.0,1500.0,2000.0,2500.0,3000,3500,4000,4500};
+float testdataY [10] = {1.435,2.33,3.686,6.426,5.444,8.42,9.23,10.55,12.33,13.22};
 byte rowPins[4] = {0, 5, 6, 7};
 byte colPins[4] = {8, A2, A3,A4};
 Interface pinkInterface = Interface (rowPins,colPins,A1,A0,10,9,-1);
